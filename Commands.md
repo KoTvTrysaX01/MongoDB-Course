@@ -1,0 +1,69 @@
+#Commands for mongosh
+
+##--- Starting ---
+mongosh																								---> starts database
+exit																								---> exits database
+cls 																								---> clears the screen
+
+
+##--- Basics ---
+show dbs 																							---> shows databases
+use admin																							---> selects / creates database
+db.dropDatabase()																					---> drops current database
+db.createCollection("name")																			---> creates collection inside a database
+db.name.insertOne({...})																			---> inserts one document to the collection
+db.name.insertMany([{...}, {...}, ...])																---> inserts many documents to the collection
+db.name.find()																						---> shows documents of the collection
+
+
+##--- Delete ---
+db.name.deleteOne({ name: "Vadim" })																---> deletes the first document that matches the query provided
+db.name.deleteMany({ gpa: 4 })																		---> deletes all documents that match the query provided.
+db.students.deleteMany({registerDate:{$exists:false}})												---> deletes all documents where specific fileds don't exist
+
+
+##--- Find / Sort ---
+db.name.find().sort({name: 1})																		---> sorts document by name alphabetically. -1 to reverse
+db.name.find().limit(2)																				---> limits number of documents to show
+db.name.find().sort({gpa: -1}).limit(1)																---> shows document with the highest gpa
+db.name.find({query}: {projection}, ...)															---> shows first document with mathes the query
+db.name.find({}, {name:true})																		---> shows all name values of all documents
+
+
+##--- Update ---
+db.name.updateOne({filter}, {update{values}})														---> updates values in the document
+db.students.updateOne({name:"Spongebob"},{$set:{fullTime: true}})									---> inserts new value to the document
+db.students.updateOne({_id: ObjectId('687042a625884f5043718dc4')}, {$unset:{fullTime: ""}})			---> removes value from the document
+db.students.updateMany({},{$set:{fullTime: false}})													---> inserts new values to all documents
+db.students.updateMany({fullTime:{$exists:false}},{$set:{fullTime: true}})							---> inserts new values to all documents where they don't exist
+
+
+##--- Comparison operators ---
+db.name.find({field: {$ne:"value"}})																---> finds documents where field IS NOT EQUAL to the value		
+db.name.find({field: {$lt: number}})																---> finds documents where field's value is less than number
+db.name.find({field: {$lte: number}})																---> finds documents where field's value is less or equal to number
+db.name.find({field: {$gt: number}})																---> finds documents where field's value is greater than number
+db.name.find({field: {$gte: number}})																---> finds documents where field's value is greater or equal to number
+db.name.find({gpa:{$gte:3, $lte:4}})																---> finds documents where field's value is between two numbers
+db.name.find({field:{$in:["value1", "value2", "value3"]}})											---> finds documents where filds' values ARE equal to the values from the array
+db.name.find({field:{$nin:["value1", "value2", "value3"]}})											---> finds documents where filds' values ARE NOT equal to the values from the array
+
+
+##--- Logical operators ---
+db.name.find({$and: [{field1: value1}, {filed1: value2}]})											---> finds documents which have value1 AND value2
+db.name.find({$or: [{field: value1}, {filed: value2}]})												---> finds documents which have value1 OR value2
+db.name.find({$nor: [{field: value1}, {filed: value2}]})											---> finds documents which have value1 NOR value2
+db.name.find({field:{$not:{$gte:number}}})															--->finds documents which filds' values ARE NOT greater or equal to number
+
+
+##--- Indexes ---
+db.name.find({field:"value"}).explain("executionStats")												---> shows information about query result
+db.name.createIndex({name:1})																		---> creates index for field "name" in alphabetical order
+db.name.dropIndex("name_1")																			---> drops index "name_1"
+db.name.getIndexes()																				---> shows indexes of the collection
+
+
+##--- Collections ---
+db.createCollection("name",{capped: true, size:10000000, max:100}, {autoIndexId: false})			---> creates new collection with capped size, max number of documents of 100 and autoIndexId set to false
+show collections																					---> shows collections of current database
+db.name.drop()																						---> drops current collection
